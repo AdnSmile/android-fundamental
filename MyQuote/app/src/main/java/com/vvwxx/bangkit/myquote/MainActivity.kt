@@ -27,6 +27,8 @@ class MainActivity : AppCompatActivity() {
 
         getRandomQuote()
 
+        binding.btnRefresh.setOnClickListener { getRandomQuote() }
+
         binding.btnAllQuotes.setOnClickListener {
             val intent = Intent(this@MainActivity, ListQuotesActivity::class.java)
             startActivity(intent)
