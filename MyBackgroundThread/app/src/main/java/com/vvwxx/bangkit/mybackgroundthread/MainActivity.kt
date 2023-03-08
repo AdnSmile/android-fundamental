@@ -27,12 +27,12 @@ class MainActivity : AppCompatActivity() {
                 for (i in 0..10) {
                     delay(500)
                     val percentage = i * 10
-                    withContext(Dispatchers.Main) {
+                    withContext(Dispatchers.Main) { // berpindah thread ke main untuk mengupdate UI
                         // update ui in main thread
                         if (percentage == 100) {
                             tvStatus.setText(R.string.task_completed)
                         } else {
-                            tvStatus.text = String.format(getString(R.string.compressing), percentage)
+                            tvStatus.text = String.format(getString(R.string.compressing), percentage) // bikin persentase
                         }
                     }
                 }
