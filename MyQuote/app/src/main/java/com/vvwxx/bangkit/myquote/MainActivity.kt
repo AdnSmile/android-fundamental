@@ -1,5 +1,6 @@
 package com.vvwxx.bangkit.myquote
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -25,11 +26,16 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         getRandomQuote()
+
+        binding.btnAllQuotes.setOnClickListener {
+            val intent = Intent(this@MainActivity, ListQuotesActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     private fun getRandomQuote() {
         binding.progressBar.visibility = View.VISIBLE
-        val client = AsyncHttpClient()
+        val client = AsyncHttpClient() // untuk membuat koneksi ke server secara asynchronous
         val url = "https://quote-api.dicoding.dev/random"
         client.get(url, object : AsyncHttpResponseHandler() {
             override fun onSuccess(
