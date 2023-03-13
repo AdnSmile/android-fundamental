@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import androidx.fragment.app.commit
 
 class HomeFragment : Fragment(), View.OnClickListener {
 
@@ -27,10 +28,9 @@ class HomeFragment : Fragment(), View.OnClickListener {
         if (v.id == R.id.btn_category) { // berpindah dari fragment Home ke fragment category
             val mCategoryFragment = CategoryFragment()
             val mFragmentManager = parentFragmentManager
-            mFragmentManager.beginTransaction().apply {
-                replace(R.id.frame_container, mCategoryFragment, CategoryFragment::class.java.simpleName)
+            mFragmentManager.commit {
                 addToBackStack(null) // ketika back maka fragment Categori akan pop out dari stack, kalau tidak pake aplikasi akan langsung keluar
-                commit()
+                replace(R.id.frame_container, mCategoryFragment, CategoryFragment::class.java.simpleName)
             }
         }
     }

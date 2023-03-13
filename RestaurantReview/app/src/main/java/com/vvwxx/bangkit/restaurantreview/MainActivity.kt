@@ -3,20 +3,14 @@ package com.vvwxx.bangkit.restaurantreview
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import com.vvwxx.bangkit.restaurantreview.databinding.ActivityMainBinding
-import retrofit2.Call
-import retrofit2.Callback
-
-import retrofit2.Response
 
 class MainActivity : AppCompatActivity() {
 
