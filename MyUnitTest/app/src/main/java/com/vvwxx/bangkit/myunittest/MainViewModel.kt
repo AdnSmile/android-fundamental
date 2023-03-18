@@ -1,6 +1,6 @@
 package com.vvwxx.bangkit.myunittest
 
-class MainViewModel(private val cuboidModel: ICuboidModel) {
+class MainViewModel(private val cuboidModel: CuboidModel) {
     fun getCircumference() = cuboidModel.getCircumference()
 
     fun getSurfaceArea() = cuboidModel.getSurfaceArea()
