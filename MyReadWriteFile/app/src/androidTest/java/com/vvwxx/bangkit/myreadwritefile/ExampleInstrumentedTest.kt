@@ -1,4 +1,4 @@
-package com.vvwxx.bangkit.myunittest
+package com.vvwxx.bangkit.myreadwritefile
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.vvwxx.bangkit.myunittest", appContext.packageName)
+        assertEquals("com.vvwxx.bangkit.myreadwritefile", appContext.packageName)
     }
 }

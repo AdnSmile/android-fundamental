@@ -1,4 +1,4 @@
-package com.vvwxx.bangkit.myunittest
+package com.vvwxx.bangkit.myreadwritefile
 
 import org.junit.Test
 
