@@ -1,73 +1,55 @@
 package com.dicoding.newsapp.data
 
+import android.util.Log
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.liveData
+import androidx.lifecycle.map
 import com.dicoding.newsapp.BuildConfig
 import com.dicoding.newsapp.data.local.entity.NewsEntity
 import com.dicoding.newsapp.data.local.room.NewsDao
-import com.dicoding.newsapp.data.remote.response.NewsResponse
 import com.dicoding.newsapp.data.remote.retrofit.ApiService
 import com.dicoding.newsapp.utils.AppExecutors
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class NewsRepository private constructor(
     private val apiService: ApiService,
     private val newsDao: NewsDao,
     private val appExecutors: AppExecutors
 ) {
-    private val result = MediatorLiveData<Result<List<NewsEntity>>>()
-
-    fun getHeadLineNews(): LiveData<Result<List<NewsEntity>>> {
-
         // skema untuk semua data yang didapat dari network disimpan ke dalam database
 
-        result.value = Result.Loading // 1
-        val client = apiService.getNews(BuildConfig.API_KEY) // 2
-        client.enqueue(object : Callback<NewsResponse> {
-            override fun onResponse(call: Call<NewsResponse>, response: Response<NewsResponse>) {
-                if (response.isSuccessful) { // 3
-                    val article = response.body()?.articles
-                    val newsList = ArrayList<NewsEntity>()
-                    appExecutors.diskIO.execute {
-                        article?.forEach { article ->
-                            val isBookmarked = newsDao.isNewsBookmarked(article.title) // 4
-                            val news = NewsEntity(
-                                article.title,
-                                article.publishedAt,
-                                article.urlToImage,
-                                article.url,
-                                isBookmarked
-                            )
-                            newsList.add(news) // 5
-                        }
-                        newsDao.deleteAll() // 6
-                        newsDao.insertNews(newsList) // 7
-                    }
-                }
+    fun getHeadlineNews(): LiveData<Result<List<NewsEntity>>> = liveData {
+        emit(Result.Loading)
+        try {
+            val response = apiService.getNews(BuildConfig.API_KEY)
+            val articles = response.articles
+            val newsList = articles.map { article ->
+                val isBookmarked = newsDao.isNewsBookmarked(article.title)
+                NewsEntity(
+                    article.title,
+                    article.publishedAt,
+                    article.urlToImage,
+                    article.url,
+                    isBookmarked
+                )
             }
-
-            override fun onFailure(call: Call<NewsResponse>, t: Throwable) {
-                result.value = Result.Error(t.message.toString()) // 8
-            }
-        } )
-        val localData = newsDao.getNews() // 9
-        result.addSource(localData) { newData: List<NewsEntity> ->
-            result.value = Result.Success(newData)
+            newsDao.deleteAll()
+            newsDao.insertNews(newsList)
+        } catch (e: Exception) {
+            Log.d("NewsRepository", "getHeadlineNews: ${e.message.toString()} ")
+            emit(Result.Error(e.message.toString()))
         }
-        return result
+        val localData: LiveData<Result<List<NewsEntity>>> = newsDao.getNews().map { Result.Success(it) }
+        emitSource(localData)
     }
 
     fun getBookmarkedNews(): LiveData<List<NewsEntity>> {
         return newsDao.getBookmarkedNews()
     }
 
-    fun setBookmarkedNews(news: NewsEntity, bookmarkState: Boolean) {
-        appExecutors.diskIO.execute {
-            news.isBookmarked = bookmarkState
-            newsDao.updateNews(news)
-        }
+    suspend fun setNewsBookmark(news: NewsEntity, bookmarkState: Boolean) {
+        //hapus penggunaan appExecutor
+        news.isBookmarked = bookmarkState
+        newsDao.updateNews(news)
     }
 
     companion object {
@@ -77,7 +59,7 @@ class NewsRepository private constructor(
             apiService: ApiService,
             newsDao: NewsDao,
             appExecutors: AppExecutors
-        ) : NewsRepository =
+        ): NewsRepository =
             instance ?: synchronized(this) {
                 instance ?: NewsRepository(apiService, newsDao, appExecutors)
             }.also { instance = it }
