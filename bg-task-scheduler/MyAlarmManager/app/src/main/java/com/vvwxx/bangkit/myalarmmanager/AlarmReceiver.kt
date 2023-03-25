@@ -127,7 +127,7 @@ class AlarmReceiver : BroadcastReceiver() {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(context, AlarmReceiver::class.java)
         intent.putExtra(EXTRA_MESSAGE, message)
-        val putExtra = intent.putExtra(EXTRA_TYPE, type)
+        intent.putExtra(EXTRA_TYPE, type)
 
         val timeArray = time.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
 
@@ -142,10 +142,15 @@ class AlarmReceiver : BroadcastReceiver() {
         Toast.makeText(context, "Repeating alarm set up", Toast.LENGTH_SHORT).show()
     }
 
-    fun isAlarmSet(context: Context, type: String): Boolean {
+    fun cancelAlarm(context: Context, type: String) {
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(context, AlarmReceiver::class.java)
         val requestCode = if (type.equals(TYPE_ONE_TIME, ignoreCase = true)) ID_ONETIME else ID_REPEATING
+        val pendingIntent = PendingIntent.getBroadcast(context, requestCode, intent, PendingIntent.FLAG_IMMUTABLE)
+        pendingIntent.cancel()
 
-        return PendingIntent.getBroadcast(context, requestCode, intent, PendingIntent.FLAG_NO_CREATE) != null
+        alarmManager.cancel(pendingIntent)
+
+        Toast.makeText(context, "Repeating alarm dibataklan", Toast.LENGTH_SHORT).show()
     }
 }
